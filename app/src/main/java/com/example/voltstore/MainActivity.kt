@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -129,7 +128,6 @@ fun MainScreen() {
                     })
                 }
                 composable(Screen.Profile.route) {
-                    // Передаем userId из authState в ProfileViewModel, чтобы избежать рассинхрона
                     val userId = if (authState is AuthState.Authenticated) (authState as AuthState.Authenticated).userId else null
                     LaunchedEffect(userId) {
                         if (userId != null) {

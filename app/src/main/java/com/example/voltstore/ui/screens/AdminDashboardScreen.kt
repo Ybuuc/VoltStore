@@ -5,14 +5,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.voltstore.data.model.Product
 import com.example.voltstore.data.model.UserProfile
@@ -23,12 +26,13 @@ import com.example.voltstore.viewmodel.AdminViewModel
 fun AdminDashboardScreen(viewModel: AdminViewModel, onBack: () -> Unit) {
     val products by viewModel.products.collectAsState()
     val users by viewModel.users.collectAsState()
+    val allOrders by viewModel.allOrders.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
     
-    // Обновляем данные при каждом открытии экрана
     LaunchedEffect(Unit) {
         viewModel.loadProducts()
         viewModel.loadUsers()
+        viewModel.loadOrders()
     }
     
     var showDialog by remember { mutableStateOf(false) }
@@ -53,7 +57,7 @@ fun AdminDashboardScreen(viewModel: AdminViewModel, onBack: () -> Unit) {
                         }
                     }
                 )
-                TabRow(selectedTabIndex = selectedTab) {
+                SecondaryTabRow(selectedTabIndex = selectedTab) {
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
@@ -65,6 +69,12 @@ fun AdminDashboardScreen(viewModel: AdminViewModel, onBack: () -> Unit) {
                         onClick = { selectedTab = 1 },
                         text = { Text("Пайдаланушылар") },
                         icon = { Icon(Icons.Default.Person, contentDescription = null) }
+                    )
+                    Tab(
+                        selected = selectedTab == 2,
+                        onClick = { selectedTab = 2 },
+                        text = { Text("Тапсырыстар") },
+                        icon = { Icon(Icons.Default.History, contentDescription = null) }
                     )
                 }
             }
@@ -104,9 +114,34 @@ fun AdminDashboardScreen(viewModel: AdminViewModel, onBack: () -> Unit) {
                                 supportingContent = { Text(user.email) },
                                 overlineContent = { Text("Рөл: ${user.role}") },
                                 trailingContent = {
-                                    if (user.role != "admin") { // Защита от удаления админа самим собой
+                                    if (user.role != "admin") {
                                         IconButton(onClick = { viewModel.deleteUser(user.id) }) {
                                             Icon(Icons.Default.Delete, contentDescription = "Удалить")
+                                        }
+                                    }
+                                }
+                            )
+                            HorizontalDivider()
+                        }
+                    }
+                }
+                2 -> {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(allOrders) { order ->
+                            ListItem(
+                                headlineContent = { Text("Тапсырыс ${order.id}") },
+                                supportingContent = { 
+                                    Column {
+                                        Text("${order.totalPrice.toInt()} ₸ - ${order.date}")
+                                        Text("Күйі: ${order.status}", color = if (order.status == "Жеткізілді") MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
+                                    }
+                                },
+                                trailingContent = {
+                                    if (order.status != "Жеткізілді") {
+                                        Button(onClick = { viewModel.finishDelivery(order.id) }) {
+                                            Icon(Icons.Default.Check, contentDescription = null)
+                                            Spacer(Modifier.width(4.dp))
+                                            Text("Аяқтау")
                                         }
                                     }
                                 }

@@ -3,6 +3,7 @@ package com.example.voltstore.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.voltstore.data.FirebaseService
+import com.example.voltstore.data.model.Order
 import com.example.voltstore.data.model.Product
 import com.example.voltstore.data.model.UserProfile
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,9 +21,13 @@ class AdminViewModel : ViewModel() {
     private val _users = MutableStateFlow<List<UserProfile>>(emptyList())
     val users: StateFlow<List<UserProfile>> = _users.asStateFlow()
 
+    private val _allOrders = MutableStateFlow<List<Order>>(emptyList())
+    val allOrders: StateFlow<List<Order>> = _allOrders.asStateFlow()
+
     init {
         loadProducts()
         loadUsers()
+        loadOrders()
     }
 
     fun loadProducts() {
@@ -34,6 +39,12 @@ class AdminViewModel : ViewModel() {
     fun loadUsers() {
         viewModelScope.launch {
             _users.value = repository.getAllUsers()
+        }
+    }
+
+    fun loadOrders() {
+        viewModelScope.launch {
+            _allOrders.value = repository.getAllOrders()
         }
     }
 
@@ -60,6 +71,13 @@ class AdminViewModel : ViewModel() {
         viewModelScope.launch {
             repository.deleteUser(userId)
             loadUsers()
+        }
+    }
+
+    fun finishDelivery(orderId: String) {
+        viewModelScope.launch {
+            repository.updateOrderStatus(orderId, "Жеткізілді")
+            loadOrders()
         }
     }
 }
