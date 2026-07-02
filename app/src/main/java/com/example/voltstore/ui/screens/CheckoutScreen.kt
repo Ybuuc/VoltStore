@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.voltstore.data.model.Order
 import com.example.voltstore.viewmodel.CartViewModel
 import com.example.voltstore.viewmodel.ProfileViewModel
+import kotlinx.coroutines.launch
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,10 +26,12 @@ fun CheckoutScreen(
     onOrderSuccess: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    var address by remember { mutableStateOf("Алматы қ., Абай даңғылы, 10 үй") }
+    val userProfile by profileViewModel.userProfile.collectAsState()
+    var address by remember(userProfile.address) { mutableStateOf(userProfile.address) }
     var paymentMethod by remember { mutableStateOf("Картамен төлеу") }
     val totalPrice = cartViewModel.getTotalPrice()
     val cartItems by cartViewModel.cartItems.collectAsState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -45,16 +48,28 @@ fun CheckoutScreen(
             Surface(tonalElevation = 8.dp) {
                 Button(
                     onClick = {
-                        val newOrder = Order(
-                            id = "VOLT-${Random().nextInt(9000) + 1000}",
-                            date = "Бүгін",
-                            products = cartItems.keys.toList(),
-                            totalPrice = totalPrice,
-                            status = "Өңделуде"
-                        )
-                        profileViewModel.addOrder(newOrder)
-                        cartViewModel.clearCart()
-                        onOrderSuccess()
+                        scope.launch {
+                            // ПРИНУДИТЕЛЬНО сохраняем профиль и ЖДЕМ завершения записи
+                            profileViewModel.updateProfileSync(
+                                name = userProfile.name,
+                                email = userProfile.email,
+                                phone = userProfile.phone,
+                                address = address
+                            )
+                            
+                            // Создаем заказ
+                            val newOrder = Order(
+                                id = "VOLT-${Random().nextInt(9000) + 1000}",
+                                date = "Бүгін",
+                                products = cartItems.keys.toList(),
+                                totalPrice = totalPrice,
+                                status = "Өңделуде"
+                            )
+                            
+                            profileViewModel.addOrder(newOrder)
+                            cartViewModel.clearCart()
+                            onOrderSuccess()
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -79,16 +94,20 @@ fun CheckoutScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(16.dp))
-                    Column {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(16.dp))
                         Text("Жеткізу мекенжайы", style = MaterialTheme.typography.labelSmall)
-                        Text(address, style = MaterialTheme.typography.bodyLarge)
                     }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        label = { Text("Адрес") }
+                    )
                 }
             }
 

@@ -15,4 +15,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Profile : Screen("profile", "Профиль", Icons.Default.Person)
     object OrderDetails : Screen("order_details/{orderId}", "Тапсырыс мәліметтері", Icons.Default.History)
     object Checkout : Screen("checkout", "Тапсырысты рәсімдеу", Icons.Default.ShoppingCart)
+    object Login : Screen("login", "Кіру", Icons.Default.Person)
+    object Register : Screen("register", "Тіркелу", Icons.Default.Person)
+    object AdminDashboard : Screen("admin_dashboard", "Админ панель", Icons.Default.Person)
 }

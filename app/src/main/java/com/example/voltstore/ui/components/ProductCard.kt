@@ -8,7 +8,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +31,8 @@ fun ProductCard(
     isFavorite: Boolean,
     modifier: Modifier = Modifier
 ) {
+    var isImageError by remember(product.imageUrl) { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -51,15 +53,29 @@ fun ProductCard(
                         .clip(RoundedCornerShape(6.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                 ) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(product.imageUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = product.name,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    if (product.imageUrl.isNotEmpty() && !isImageError) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(product.imageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = product.name,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            onError = { isImageError = true }
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = product.name.take(1),
+                                style = MaterialTheme.typography.headlineSmall,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            )
+                        }
+                    }
                 }
 
                 IconButton(
@@ -120,7 +136,6 @@ fun ProductCard(
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.primary
             )
-
             Spacer(modifier = Modifier.height(2.dp))
 
             Button(

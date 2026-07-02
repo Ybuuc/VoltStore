@@ -41,7 +41,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun VoltStoreTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false, // Отключаем динамические цвета для сохранения нашего дизайна
     content: @Composable () -> Unit
 ) {

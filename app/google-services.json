@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "113956013330",
+    "project_id": "voltstore-108fb",
+    "storage_bucket": "voltstore-108fb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113956013330:android:ffb72b413fbbc5bef8dfcb",
+        "android_client_info": {
+          "package_name": "com.example.voltstore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtDsTez7RLjQWEFLN5RZQldnYJc7sKN5k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

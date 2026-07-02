@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -25,6 +26,10 @@ fun CatalogScreen(
 ) {
     val products by catalogViewModel.products.collectAsState()
     val favoriteProducts by favoritesViewModel.favoriteProducts.collectAsState()
+
+    LaunchedEffect(Unit) {
+        catalogViewModel.loadProducts()
+    }
 
     Scaffold(
         topBar = {

@@ -20,7 +20,7 @@ class FavoritesViewModel : ViewModel() {
         _favoriteProducts.value = current
     }
 
-    fun isFavorite(productId: Int): Boolean {
+    fun isFavorite(productId: String): Boolean {
         return _favoriteProducts.value.any { it.id == productId }
     }
 }

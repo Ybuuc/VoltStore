@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Loyalty
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -23,12 +24,14 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.voltstore.viewmodel.AuthViewModel
 import com.example.voltstore.viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
+    authViewModel: AuthViewModel,
     onOrderClick: (String) -> Unit
 ) {
     val profile by viewModel.userProfile.collectAsState()
@@ -59,6 +62,14 @@ fun ProfileScreen(
                         isEditing = !isEditing
                     }) {
                         Text(if (isEditing) "Сақтау" else "Өңдеу")
+                    }
+                    if (profile.role == "admin") {
+                        TextButton(onClick = { onOrderClick("ADMIN_PANEL") }) {
+                            Text("Админка", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                    IconButton(onClick = { authViewModel.logout() }) {
+                        Icon(Icons.Default.Logout, contentDescription = "Logout")
                     }
                 }
             )

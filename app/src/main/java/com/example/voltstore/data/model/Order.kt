@@ -1,9 +1,12 @@
 package com.example.voltstore.data.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Order(
-    val id: String,
-    val date: String,
-    val products: List<Product>,
-    val totalPrice: Double,
-    val status: String
+    val id: String = "",
+    val date: String = "",
+    val products: List<Product> = emptyList(),
+    val totalPrice: Double = 0.0,
+    val status: String = ""
 )
